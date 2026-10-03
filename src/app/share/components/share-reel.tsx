@@ -29,30 +29,43 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 		let destination = viewport.scrollLeft
 		let writtenScroll = viewport.scrollLeft
 		let ribbon: ReturnType<typeof createRibbonCanvas> | undefined
+		let maximum = 0
+		let viewportWidth = 0
+		let centers: number[] = []
+		let displayedIndex = -1
 		let suppressClick = false
 		let drag: { id: number; x: number; y: number; scroll: number; lastX: number; time: number; speed: number; moved: boolean } | null = null
 
-		const updateControls = () => {
-			const maximum = viewport.scrollWidth - viewport.clientWidth
-			if (previousRef.current) previousRef.current.disabled = viewport.scrollLeft < 2
-			if (nextRef.current) nextRef.current.disabled = maximum - viewport.scrollLeft < 2
-			const center = viewport.scrollLeft + viewport.clientWidth / 2
+		const measure = () => {
+			viewportWidth = viewport.clientWidth
+			maximum = Math.max(0, viewport.scrollWidth - viewportWidth)
+			centers = links.map(link => link.offsetLeft + link.offsetWidth / 2)
+		}
+		measure()
+		const updateControls = (position: number) => {
+			const previousDisabled = position < 2
+			const nextDisabled = maximum - position < 2
+			if (previousRef.current && previousRef.current.disabled !== previousDisabled) previousRef.current.disabled = previousDisabled
+			if (nextRef.current && nextRef.current.disabled !== nextDisabled) nextRef.current.disabled = nextDisabled
+			const center = position + viewportWidth / 2
 			let nearest = 0
 			let distance = Infinity
-			links.forEach((link, index) => {
-				const difference = Math.abs(link.offsetLeft + link.offsetWidth / 2 - center)
+			centers.forEach((itemCenter, index) => {
+				const difference = Math.abs(itemCenter - center)
 				if (difference < distance) {
 					nearest = index
 					distance = difference
 				}
 			})
-			if (counterRef.current) counterRef.current.textContent = `${nearest + 1} / ${shares.length}`
+			if (counterRef.current && displayedIndex !== nearest) {
+				counterRef.current.textContent = `${nearest + 1} / ${shares.length}`
+				displayedIndex = nearest
+			}
 		}
 
 		const animate = (time: number) => {
 			const dt = Math.min(64, lastTime ? time - lastTime : 16.67)
 			lastTime = time
-			const maximum = Math.max(0, viewport.scrollWidth - viewport.clientWidth)
 			destination = Math.max(0, Math.min(maximum, destination))
 			const current = viewport.scrollLeft
 			const next = motion.matches ? destination : approach(current, destination, dt, drag?.moved ? 32 : 110)
@@ -64,8 +77,8 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 			const target = motion.matches ? 0 : Math.min(1, Math.abs(velocity) / 2.4)
 			wave = motion.matches ? 0 : approach(wave, target, dt, 160)
 			ribbon?.draw(position, wave)
-			updateControls()
-			if (Math.abs(wave) > 0.002 || Math.abs(velocity) > 0.005 || Math.abs(destination - position) > 0.5 || drag?.moved) {
+			updateControls(position)
+			if (Math.abs(wave) > 0.002 || Math.abs(velocity) > 0.005 || Math.abs(destination - position) > 0.5) {
 				frame = requestAnimationFrame(animate)
 			} else {
 				ribbon?.draw(position, 0)
@@ -83,9 +96,8 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 		}
 		const onWheel = (event: WheelEvent) => {
 			if (event.ctrlKey || event.shiftKey) return
-			const multiplier = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewport.clientWidth : 1
+			const multiplier = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewportWidth : 1
 			const delta = (Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY) * multiplier
-			const maximum = viewport.scrollWidth - viewport.clientWidth
 			if (maximum <= 0 || (delta < 0 && viewport.scrollLeft <= 0) || (delta > 0 && viewport.scrollLeft >= maximum - 1)) return
 			event.preventDefault()
 			destination = Math.max(0, Math.min(maximum, destination + delta))
@@ -147,10 +159,11 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 		}
 		ribbon = createRibbonCanvas(viewport, panels, wake)
 		moveRef.current = direction => {
-			destination += direction * viewport.clientWidth * 0.7
+			destination += direction * viewportWidth * 0.7
 			wake()
 		}
 		const resize = new ResizeObserver(() => {
+			measure()
 			ribbon?.resize()
 			wake()
 		})

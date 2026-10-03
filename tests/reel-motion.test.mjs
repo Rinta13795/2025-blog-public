@@ -41,3 +41,17 @@ test('adjacent columns remain continuous and the resting wave is flat', () => {
 		assert.ok(ribbonY(200, width, 0, 500) === 0)
 	}
 })
+test('wider sheared strips stay within a tenth of a pixel of the wave', () => {
+	for (const width of [320, 390, 768, 1280]) {
+		for (const position of [0, 300, 1000]) {
+			for (let x = 0; x < width; x += 8) {
+				const start = ribbonY(x, width, 1, position)
+				const end = ribbonY(x + 8, width, 1, position)
+				for (const fraction of [0.25, 0.5, 0.75]) {
+					const interpolated = start + (end - start) * fraction
+					assert.ok(Math.abs(interpolated - ribbonY(x + 8 * fraction, width, 1, position)) < 0.1)
+				}
+			}
+		}
+	}
+})
