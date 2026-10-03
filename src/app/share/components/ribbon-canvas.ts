@@ -79,7 +79,7 @@ export function createRibbonCanvas(viewport: HTMLElement, panels: HTMLElement[],
 				const step = 2
 				for (let column = Math.max(0, Math.floor(-x / step) * step); column < surface.width && x + column < width; column += step) {
 					const slice = Math.min(step, surface.width - column)
-					const y = ribbonY(x + column + slice / 2, width, surface.width, strength)
+					const y = ribbonY(x + column + slice / 2, width, strength, position)
 					context.drawImage(surface.bitmap, column * ratio, 0, slice * ratio, surface.bitmap.height, x + column, surface.y + y, slice, surface.height)
 				}
 			})

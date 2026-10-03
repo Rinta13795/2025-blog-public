@@ -18,8 +18,26 @@ test('reversing input never overshoots the new target', () => {
 		assert.ok(value >= 100 && value < 700)
 	}
 })
-test('adjacent columns share a continuous curve, without per-card phase resets', () => {
+test('every viewport contains a crest and trough throughout scrolling', () => {
+	for (const width of [320, 390, 768, 1280, 1920]) {
+		for (let position = 0; position < width * 4; position += width / 17) {
+			const values = Array.from({ length: 101 }, (_, i) => ribbonY((i / 100) * width, width, 1, position))
+			const amplitude = Math.min(40, width * 0.07)
+			assert.ok(Math.min(...values) < -amplitude * 0.99)
+			assert.ok(Math.max(...values) > amplitude * 0.99)
+		}
+	}
+})
+test('the wave phase travels continuously with scroll distance', () => {
 	const width = 1280
-	for (let x = 0; x < width; x++) assert.ok(Math.abs(ribbonY(x + 1, width, 280, 1) - ribbonY(x, width, 280, 1)) < 0.12)
-	assert.ok(ribbonY(400, width, 280, 0) === 0)
+	const initial = ribbonY(200, width, 1, 300)
+	assert.ok(Math.abs(initial - ribbonY(200, width, 1, 600)) > 10)
+	assert.ok(Math.abs(ribbonY(200, width, 1, 600) - ribbonY(380, width, 1, 300)) < 1e-9)
+	assert.ok(Math.abs(ribbonY(200, width, 1, 300.1) - initial) < 0.02)
+})
+test('adjacent columns remain continuous and the resting wave is flat', () => {
+	for (const width of [320, 390, 1280]) {
+		for (let x = 0; x < width; x++) assert.ok(Math.abs(ribbonY(x + 1, width, 1, 500) - ribbonY(x, width, 1, 500)) < 0.45)
+		assert.ok(ribbonY(200, width, 0, 500) === 0)
+	}
 })
