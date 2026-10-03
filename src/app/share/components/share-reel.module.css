@@ -32,6 +32,9 @@
 	outline: 1px solid var(--color-brand);
 	outline-offset: 2px;
 }
+.stage {
+	position: relative;
+}
 .viewport {
 	position: relative;
 	overflow-x: auto;
@@ -40,7 +43,7 @@
 	scrollbar-color: var(--color-brand) transparent;
 	overscroll-behavior-x: contain;
 	cursor: grab;
-	touch-action: pan-x pan-y;
+	touch-action: pan-x pan-y pinch-zoom;
 	scroll-behavior: auto;
 }
 .viewport[data-dragging] {
@@ -51,10 +54,11 @@
 	align-items: flex-start;
 	width: max-content;
 	gap: 20px;
-	padding: 48px 20px 32px;
+	padding: 0 20px 32px;
 }
 .item {
 	display: block;
+	padding-top: 48px;
 	flex: 0 0 auto;
 	width: clamp(180px, 22vw, 280px);
 	color: var(--color-primary);

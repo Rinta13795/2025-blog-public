@@ -3,6 +3,8 @@
 import { useEffect, useRef } from 'react'
 import type { Share } from './share-card'
 import styles from './share-reel.module.css'
+import { approach } from './reel-motion'
+import { createRibbonCanvas } from './ribbon-canvas'
 
 /** Original implementation inspired by Reel Flux's velocity-reactive ribbon.
  * Keep links in the DOM: titles stay readable and keyboard navigation stays native.
@@ -12,6 +14,7 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 	const previousRef = useRef<HTMLButtonElement>(null)
 	const nextRef = useRef<HTMLButtonElement>(null)
 	const counterRef = useRef<HTMLSpanElement>(null)
+	const moveRef = useRef<(direction: number) => void>(() => {})
 
 	useEffect(() => {
 		const viewport = viewportRef.current
@@ -23,7 +26,9 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 		let lastTime = 0
 		let lastScroll = viewport.scrollLeft
 		let wave = 0
-		let momentum = 0
+		let destination = viewport.scrollLeft
+		let writtenScroll = viewport.scrollLeft
+		let ribbon: ReturnType<typeof createRibbonCanvas> | undefined
 		let suppressClick = false
 		let drag: { id: number; x: number; y: number; scroll: number; lastX: number; time: number; speed: number; moved: boolean } | null = null
 
@@ -45,34 +50,25 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 		}
 
 		const animate = (time: number) => {
-			const dt = Math.min(32, lastTime ? time - lastTime : 16.67)
+			const dt = Math.min(64, lastTime ? time - lastTime : 16.67)
 			lastTime = time
-			if (motion.matches) momentum = 0
-			if (!drag && Math.abs(momentum) > 0.02 && !motion.matches) {
-				const before = viewport.scrollLeft
-				viewport.scrollLeft += momentum * dt
-				momentum *= Math.pow(0.93, dt / 16.67)
-				if (viewport.scrollLeft === before) momentum = 0
-			}
+			const maximum = Math.max(0, viewport.scrollWidth - viewport.clientWidth)
+			destination = Math.max(0, Math.min(maximum, destination))
+			const current = viewport.scrollLeft
+			const next = motion.matches ? destination : approach(current, destination, dt, drag?.moved ? 32 : 110)
+			viewport.scrollLeft = Math.abs(next - destination) < 0.5 ? destination : next
+			writtenScroll = viewport.scrollLeft
 			const position = viewport.scrollLeft
 			const velocity = (position - lastScroll) / Math.max(dt, 1)
 			lastScroll = position
 			const target = motion.matches ? 0 : Math.max(-1, Math.min(1, velocity / 2.4))
-			wave += (target - wave) * (1 - Math.exp(-dt / 100))
-			panels.forEach(panel => {
-				const center = panel.parentElement!.offsetLeft + panel.offsetWidth / 2 - position
-				const phase = (center - viewport.clientWidth / 2) / 180
-				panel.style.transform = motion.matches
-					? ''
-					: `perspective(900px) translate3d(0, ${Math.sin(phase) * wave * 32}px, ${Math.cos(phase) * Math.abs(wave) * 36}px) rotateY(${Math.sin(phase) * wave * 12}deg) rotateZ(${Math.cos(phase) * wave * 3}deg)`
-			})
+			wave = motion.matches ? 0 : approach(wave, target, dt, 160)
+			ribbon?.draw(position, wave)
 			updateControls()
-			if (Math.abs(wave) > 0.002 || Math.abs(velocity) > 0.005 || Math.abs(momentum) > 0.02 || drag?.moved) {
+			if (Math.abs(wave) > 0.002 || Math.abs(velocity) > 0.005 || Math.abs(destination - position) > 0.5 || drag?.moved) {
 				frame = requestAnimationFrame(animate)
 			} else {
-				panels.forEach(panel => {
-					panel.style.transform = ''
-				})
+				ribbon?.draw(position, 0)
 				frame = 0
 				lastTime = 0
 			}
@@ -81,22 +77,23 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 			if (!frame) frame = requestAnimationFrame(animate)
 		}
 		const onScroll = () => {
+			// Touch, scrollbar and keyboard focus may scroll natively.
+			if (Math.abs(viewport.scrollLeft - writtenScroll) > 1) destination = viewport.scrollLeft
 			wake()
 		}
 		const onWheel = (event: WheelEvent) => {
-			if (event.ctrlKey || event.shiftKey || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return
+			if (event.ctrlKey || event.shiftKey) return
 			const multiplier = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewport.clientWidth : 1
-			const delta = event.deltaY * multiplier
+			const delta = (Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY) * multiplier
 			const maximum = viewport.scrollWidth - viewport.clientWidth
 			if (maximum <= 0 || (delta < 0 && viewport.scrollLeft <= 0) || (delta > 0 && viewport.scrollLeft >= maximum - 1)) return
 			event.preventDefault()
-			momentum = 0
-			viewport.scrollBy({ left: delta, behavior: motion.matches ? 'instant' : 'smooth' })
+			destination = Math.max(0, Math.min(maximum, destination + delta))
 			wake()
 		}
 		const onDown = (event: PointerEvent) => {
 			suppressClick = false
-			momentum = 0
+			destination = viewport.scrollLeft
 			// Touch uses native horizontal scrolling, including its inertia and pan-y escape.
 			if (event.pointerType === 'touch' || event.button !== 0) return
 			drag = {
@@ -126,12 +123,12 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 			drag.speed = Math.max(-3, Math.min(3, (drag.lastX - event.clientX) / elapsed))
 			drag.lastX = event.clientX
 			drag.time = event.timeStamp
-			viewport.scrollLeft = drag.scroll - dx
+			destination = drag.scroll - dx
 			wake()
 		}
 		const finish = (event: PointerEvent) => {
 			if (!drag || drag.id !== event.pointerId) return
-			momentum = event.type === 'pointerup' && drag.moved && event.timeStamp - drag.time < 100 ? drag.speed : 0
+			if (event.type === 'pointerup' && drag.moved && event.timeStamp - drag.time < 100 && !motion.matches) destination += drag.speed * 220
 			const id = drag.id
 			drag = null
 			delete viewport.dataset.dragging
@@ -148,7 +145,15 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 		const onDragStart = (event: DragEvent) => {
 			event.preventDefault()
 		}
-		const resize = new ResizeObserver(wake)
+		ribbon = createRibbonCanvas(viewport, panels, wake)
+		moveRef.current = direction => {
+			destination += direction * viewport.clientWidth * 0.7
+			wake()
+		}
+		const resize = new ResizeObserver(() => {
+			ribbon?.resize()
+			wake()
+		})
 		resize.observe(viewport)
 		viewport.addEventListener('scroll', onScroll, { passive: true })
 		viewport.addEventListener('wheel', onWheel, { passive: false })
@@ -165,6 +170,8 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 		return () => {
 			cancelAnimationFrame(frame)
 			resize.disconnect()
+			ribbon?.dispose()
+			moveRef.current = () => {}
 			viewport.removeEventListener('scroll', onScroll)
 			viewport.removeEventListener('wheel', onWheel)
 			viewport.removeEventListener('pointerdown', onDown)
@@ -179,14 +186,7 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 		}
 	}, [shares])
 
-	const move = (direction: number) => {
-		const viewport = viewportRef.current
-		if (!viewport) return
-		viewport.scrollBy({
-			left: direction * viewport.clientWidth * 0.7,
-			behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'
-		})
-	}
+	const move = (direction: number) => moveRef.current(direction)
 
 	return (
 		<section className={styles.reel} aria-label='网站收藏'>
@@ -202,29 +202,37 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 					</button>
 				</div>
 			</div>
-			<div ref={viewportRef} className={styles.viewport} aria-describedby='share-reel-hint'>
-				<div className={styles.track}>
-					{shares.map(share => (
-						<a key={share.url} className={styles.item} href={share.url} target='_blank' rel='noopener noreferrer' aria-label={`${share.name}，在新标签页访问`}>
-							<div data-reel-panel className={styles.panel}>
-								<img
-									src={share.logo}
-									alt=''
-									draggable={false}
-									loading='lazy'
-									onError={event => {
-										event.currentTarget.hidden = true
-									}}
-								/>
-								<span className={styles.fallback} aria-hidden='true'>
-									{share.name.slice(0, 1)}
-								</span>
-							</div>
-							<h3>{share.name}</h3>
-							<p className={styles.tags}>{share.tags.join(' · ')}</p>
-							<p className={styles.description}>{share.description}</p>
-						</a>
-					))}
+			<div className={styles.stage}>
+				<div ref={viewportRef} className={styles.viewport} aria-describedby='share-reel-hint'>
+					<div className={styles.track}>
+						{shares.map(share => (
+							<a
+								key={share.url}
+								className={styles.item}
+								href={share.url}
+								target='_blank'
+								rel='noopener noreferrer'
+								aria-label={`${share.name}，在新标签页访问`}>
+								<div data-reel-panel className={styles.panel}>
+									<img
+										src={share.logo}
+										alt=''
+										draggable={false}
+										loading='lazy'
+										onError={event => {
+											event.currentTarget.hidden = true
+										}}
+									/>
+									<span className={styles.fallback} aria-hidden='true'>
+										{share.name.slice(0, 1)}
+									</span>
+								</div>
+								<h3>{share.name}</h3>
+								<p className={styles.tags}>{share.tags.join(' · ')}</p>
+								<p className={styles.description}>{share.description}</p>
+							</a>
+						))}
+					</div>
 				</div>
 			</div>
 		</section>
