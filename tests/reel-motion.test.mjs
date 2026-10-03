@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { approach, ribbonY } from '../src/app/share/components/reel-motion.ts'
+import { approach, ribbonY, scrollPosition } from '../src/app/share/components/reel-motion.ts'
 
 test('easing covers the same distance regardless of display refresh rate', () => {
 	const results = [30, 60, 120].map(fps => {
@@ -54,4 +54,18 @@ test('wider sheared strips stay within a tenth of a pixel of the wave', () => {
 			}
 		}
 	}
+})
+
+test('gesture positions arrive in the next frame without accumulating easing delay', () => {
+	for (const fps of [30, 60, 120]) {
+		let current = 0
+		for (const target of [40, 150, 410, 750, 600, 200, 0]) {
+			current = scrollPosition(current, target, 1000 / fps, true)
+			assert.equal(current, target)
+		}
+	}
+})
+test('release coasting and buttons still approach their target without jumping', () => {
+	const next = scrollPosition(100, 700, 16.67, false)
+	assert.ok(next > 100 && next < 200)
 })

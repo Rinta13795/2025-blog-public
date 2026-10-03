@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 import type { Share } from './share-card'
 import styles from './share-reel.module.css'
-import { approach } from './reel-motion'
+import { approach, scrollPosition } from './reel-motion'
 import { createRibbonCanvas } from './ribbon-canvas'
 
 /** Original implementation inspired by Reel Flux's velocity-reactive ribbon.
@@ -28,6 +28,7 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 		let wave = 0
 		let destination = viewport.scrollLeft
 		let writtenScroll = viewport.scrollLeft
+		let directInput = false
 		let ribbon: ReturnType<typeof createRibbonCanvas> | undefined
 		let maximum = 0
 		let viewportWidth = 0
@@ -68,14 +69,14 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 			lastTime = time
 			destination = Math.max(0, Math.min(maximum, destination))
 			const current = viewport.scrollLeft
-			const next = motion.matches ? destination : approach(current, destination, dt, drag?.moved ? 32 : 110)
+			const next = scrollPosition(current, destination, dt, motion.matches || directInput || Boolean(drag?.moved))
 			viewport.scrollLeft = Math.abs(next - destination) < 0.5 ? destination : next
 			writtenScroll = viewport.scrollLeft
 			const position = viewport.scrollLeft
 			const velocity = (position - lastScroll) / Math.max(dt, 1)
 			lastScroll = position
 			const target = motion.matches ? 0 : Math.min(1, Math.abs(velocity) / 2.4)
-			wave = motion.matches ? 0 : approach(wave, target, dt, 160)
+			wave = motion.matches ? 0 : approach(wave, target, dt, target > wave ? 35 : 160)
 			ribbon?.draw(position, wave)
 			updateControls(position)
 			if (Math.abs(wave) > 0.002 || Math.abs(velocity) > 0.005 || Math.abs(destination - position) > 0.5) {
@@ -96,6 +97,8 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 		}
 		const onWheel = (event: WheelEvent) => {
 			if (event.ctrlKey || event.shiftKey) return
+			// Pixel deltas (including device-provided inertia) must not be eased again.
+			directInput = event.deltaMode === 0
 			const multiplier = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewportWidth : 1
 			const delta = (Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY) * multiplier
 			if (maximum <= 0 || (delta < 0 && viewport.scrollLeft <= 0) || (delta > 0 && viewport.scrollLeft >= maximum - 1)) return
@@ -105,6 +108,7 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 		}
 		const onDown = (event: PointerEvent) => {
 			suppressClick = false
+			directInput = false
 			destination = viewport.scrollLeft
 			// Touch uses native horizontal scrolling, including its inertia and pan-y escape.
 			if (event.pointerType === 'touch' || event.button !== 0) return
@@ -142,6 +146,7 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 			if (!drag || drag.id !== event.pointerId) return
 			if (event.type === 'pointerup' && drag.moved && event.timeStamp - drag.time < 100 && !motion.matches) destination += drag.speed * 220
 			const id = drag.id
+			directInput = false
 			drag = null
 			delete viewport.dataset.dragging
 			if (viewport.hasPointerCapture(id)) viewport.releasePointerCapture(id)
@@ -159,6 +164,7 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 		}
 		ribbon = createRibbonCanvas(viewport, panels, wake)
 		moveRef.current = direction => {
+			directInput = false
 			destination += direction * viewportWidth * 0.7
 			wake()
 		}

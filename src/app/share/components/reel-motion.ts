@@ -12,3 +12,9 @@ export function ribbonY(x: number, viewportWidth: number, strength: number, posi
 	const amplitude = Math.min(40, wavelength * 0.07) * strength
 	return Math.sin(phase) * amplitude
 }
+
+/** Gestures already carry timing/inertia from the input device. Only button
+ * navigation and mouse-release coasting should ease towards a destination. */
+export function scrollPosition(current: number, destination: number, elapsed: number, direct: boolean) {
+	return direct ? destination : approach(current, destination, elapsed, 110)
+}
