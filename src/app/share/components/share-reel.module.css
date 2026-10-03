@@ -1,0 +1,143 @@
+.reel {
+	width: 100%;
+}
+.toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
+	color: var(--color-secondary);
+	font-size: 11px;
+	line-height: 1.9;
+}
+.controls {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-variant-numeric: tabular-nums;
+}
+.controls button {
+	padding: 8px 18px;
+	border: 1px solid var(--color-border);
+	border-radius: 5px;
+	color: var(--color-primary);
+	background: transparent;
+}
+.controls button:disabled {
+	opacity: 0.4;
+	cursor: default;
+}
+.controls button:focus-visible,
+.item:focus-visible {
+	outline: 1px solid var(--color-brand);
+	outline-offset: 2px;
+}
+.viewport {
+	position: relative;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: var(--color-brand) transparent;
+	overscroll-behavior-x: contain;
+	cursor: grab;
+	touch-action: pan-x pan-y;
+	scroll-behavior: auto;
+}
+.viewport[data-dragging] {
+	cursor: grabbing;
+}
+.track {
+	display: flex;
+	align-items: flex-start;
+	width: max-content;
+	gap: 20px;
+	padding: 48px 20px 32px;
+}
+.item {
+	display: block;
+	flex: 0 0 auto;
+	width: clamp(180px, 22vw, 280px);
+	color: var(--color-primary);
+	text-align: center;
+	text-decoration: none;
+	user-select: none;
+	-webkit-user-select: none;
+	cursor: inherit;
+}
+.panel {
+	position: relative;
+	display: grid;
+	place-items: center;
+	height: 180px;
+	padding: 20px;
+	background: var(--color-card);
+	border: 1px solid var(--color-border);
+	border-radius: 5px;
+	transform-origin: center;
+}
+.panel img {
+	position: relative;
+	z-index: 1;
+	display: block;
+	width: 118px;
+	height: 118px;
+	object-fit: contain;
+	pointer-events: none;
+}
+.panel img[hidden] {
+	display: none;
+}
+.fallback {
+	position: absolute;
+	color: var(--color-secondary);
+	font-size: 38px;
+	font-weight: 700;
+}
+.panel:has(img:not([hidden])) .fallback {
+	visibility: hidden;
+}
+.item h3 {
+	margin-top: 20px;
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1.9;
+	overflow-wrap: anywhere;
+}
+.tags {
+	margin-top: 4.5px;
+	color: var(--color-secondary);
+	font-size: 11px;
+	line-height: 1.9;
+}
+.description {
+	margin-top: 10px;
+	color: var(--color-secondary);
+	font-size: 14px;
+	line-height: 1.9;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	text-align: left;
+}
+.item:hover h3 {
+	color: var(--color-brand);
+}
+@media (max-width: 640px) {
+	.toolbar {
+		flex-wrap: wrap;
+	}
+	.track {
+		gap: 16px;
+		padding-inline: 20px;
+	}
+	.item {
+		width: 70vw;
+		max-width: 280px;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.panel {
+		transform: none !important;
+	}
+}

@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { type LogoItem } from './components/logo-upload-dialog'
 import { ShareCard, type Share } from './components/share-card'
+import ShareReel from './components/share-reel'
 
 interface GridViewProps {
 	shares: Share[]
@@ -56,11 +57,15 @@ export default function GridView({ shares, isEditMode = false, onUpdate, onDelet
 				</div>
 			</div>
 
-			<div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
-				{filteredShares.map(share => (
-					<ShareCard key={share.url} share={share} isEditMode={isEditMode} onUpdate={onUpdate} onDelete={() => onDelete?.(share)} />
-				))}
-			</div>
+			{isEditMode ? (
+				<div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
+					{filteredShares.map(share => (
+						<ShareCard key={share.url} share={share} isEditMode={isEditMode} onUpdate={onUpdate} onDelete={() => onDelete?.(share)} />
+					))}
+				</div>
+			) : filteredShares.length > 0 ? (
+				<ShareReel key={`${searchTerm}:${selectedTag}`} shares={filteredShares} />
+			) : null}
 
 			{filteredShares.length === 0 && (
 				<div className='mt-12 text-center text-gray-500'>
