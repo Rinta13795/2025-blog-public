@@ -61,7 +61,7 @@ export default function ShareReel({ shares }: { shares: Share[] }) {
 			const position = viewport.scrollLeft
 			const velocity = (position - lastScroll) / Math.max(dt, 1)
 			lastScroll = position
-			const target = motion.matches ? 0 : Math.max(-1, Math.min(1, velocity / 2.4))
+			const target = motion.matches ? 0 : Math.min(1, Math.abs(velocity) / 2.4)
 			wave = motion.matches ? 0 : approach(wave, target, dt, 160)
 			ribbon?.draw(position, wave)
 			updateControls()

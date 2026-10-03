@@ -3,8 +3,12 @@ export function approach(current: number, target: number, elapsed: number, durat
 	return current + (target - current) * (1 - Math.exp(-elapsed / duration))
 }
 
-/** One screen-space curve shared by every column of every card. */
-export function ribbonY(x: number, viewportWidth: number, cardWidth: number, strength: number) {
-	const wavelength = Math.max(viewportWidth * 1.8, cardWidth * 6)
-	return Math.sin(((x - viewportWidth / 2) * Math.PI * 2) / wavelength) * strength * 40
+/** A full shared wave in the viewport; scroll distance advances its phase.
+ * Amplitude stays non-negative so reversing input moves the wave backwards
+ * instead of flipping every crest into a trough. */
+export function ribbonY(x: number, viewportWidth: number, strength: number, position: number) {
+	const wavelength = Math.max(1, viewportWidth)
+	const phase = ((x + position * 0.6) / wavelength - 0.25) * Math.PI * 2
+	const amplitude = Math.min(40, wavelength * 0.07) * strength
+	return Math.sin(phase) * amplitude
 }
