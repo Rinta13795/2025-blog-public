@@ -1,15 +1,15 @@
 [
 	{
-		"id": "sample-tea",
+		"id": "sample-dusk",
 		"date": "2026-10-12",
 		"type": "video",
-		"src": "/daily/sample-tea.mp4",
-		"poster": "/daily/sample-tea.webp",
+		"src": "/daily/soft-dusk.mp4",
+		"poster": "/daily/soft-dusk.webp",
 		"width": 720,
-		"height": 960,
-		"caption": "示例视频：傍晚的茶园，风是绿色的。",
-		"location": "茶山",
-		"mood": "🍃"
+		"height": 888,
+		"caption": "示例视频：傍晚的云，像有人在天上点了一盏灯。",
+		"location": "海边",
+		"mood": "🌆"
 	},
 	{
 		"id": "sample-note",
@@ -20,65 +20,73 @@
 		"mood": "☕"
 	},
 	{
-		"id": "sample-persimmon",
+		"id": "sample-sea",
 		"date": "2026-10-08",
 		"type": "image",
-		"src": "/images/pictures/d868a9d12c640607.webp",
-		"width": 1280,
-		"height": 1707,
-		"caption": "示例：挂在窗边的柿子，等它慢慢变甜。",
-		"mood": "🧡"
+		"src": "/daily/soft-01.webp",
+		"width": 1096,
+		"height": 1352,
+		"caption": "示例：海边的下午，咖啡还没凉。",
+		"mood": "☕"
 	},
 	{
-		"id": "sample-lake",
+		"id": "sample-still",
 		"date": "2026-10-03",
 		"type": "video",
-		"src": "/daily/sample-lake.mp4",
-		"poster": "/daily/sample-lake.webp",
-		"width": 1280,
-		"height": 960,
-		"caption": "示例视频：湖面安静得像一张纸。",
-		"location": "湖边",
+		"src": "/daily/soft-still.mp4",
+		"poster": "/daily/soft-still.webp",
+		"width": 720,
+		"height": 888,
+		"caption": "示例视频：水面很静，世界像按了暂停。",
 		"mood": "🌊"
 	},
 	{
-		"id": "sample-potato",
+		"id": "sample-tower",
 		"date": "2026-09-27",
 		"type": "image",
-		"src": "/images/pictures/294e9fe7cb4f263d.webp",
-		"width": 1280,
-		"height": 1707,
-		"caption": "示例：周末的菜市场收获。",
-		"mood": "🍠"
+		"src": "/daily/soft-02.webp",
+		"width": 1096,
+		"height": 1350,
+		"caption": "示例：一栋站在水上的小楼。"
 	},
 	{
-		"id": "sample-gardenia",
+		"id": "sample-door",
 		"date": "2026-09-15",
 		"type": "image",
-		"src": "/images/pictures/500a879c4bb952bc.webp",
-		"width": 1080,
-		"height": 1920,
-		"caption": "示例：阳台的栀子花开了。",
-		"location": "阳台",
-		"mood": "🌼"
+		"src": "/daily/soft-05.webp",
+		"width": 1092,
+		"height": 1344,
+		"caption": "示例：粉色的门，开着一树的花。",
+		"location": "巷子口",
+		"mood": "🌸"
 	},
 	{
-		"id": "sample-blossom",
+		"id": "sample-wall",
 		"date": "2026-09-09",
 		"type": "image",
-		"src": "/images/pictures/25e9f3a783d6002d.webp",
-		"width": 600,
-		"height": 1031,
-		"caption": "示例：雨后的花，挂着很多小水珠。"
+		"src": "/daily/soft-06.webp",
+		"width": 1094,
+		"height": 1348,
+		"caption": "示例：整面墙都在开花。"
 	},
 	{
-		"id": "sample-tower",
+		"id": "sample-balcony",
+		"date": "2026-09-05",
+		"type": "image",
+		"src": "/daily/soft-04.webp",
+		"width": 1164,
+		"height": 1436,
+		"caption": "示例：抬头看，楼上也是一座花园。"
+	},
+	{
+		"id": "sample-books",
 		"date": "2026-09-02",
 		"type": "image",
-		"src": "/images/pictures/00331496b31159e4.webp",
-		"width": 1279,
-		"height": 1706,
-		"caption": "示例：午后散步，抬头看见塔。",
-		"location": "古塔"
+		"src": "/daily/soft-07.webp",
+		"width": 1098,
+		"height": 1352,
+		"caption": "示例：藏在花里的旧书店。",
+		"location": "旧书店",
+		"mood": "📚"
 	}
 ]
