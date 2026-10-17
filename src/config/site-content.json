@@ -45,30 +45,23 @@
 		{
 			"id": "github",
 			"type": "github",
-			"value": "https://github.com/yysuni",
+			"value": "https://github.com/Rinta13795",
 			"label": "Github",
-			"order": 3
+			"order": 5
 		},
 		{
-			"id": "juejin",
-			"type": "juejin",
-			"value": "https://juejin.cn/user/2427311675422382",
-			"label": "稀土掘金",
-			"order": 2
-		},
-		{
-			"id": "email",
-			"type": "email",
-			"value": "yysuni1001@gmail.com",
-			"label": "",
-			"order": 1
-		},
-		{
-			"id": "button-1778385203357",
-			"type": "link",
-			"value": "",
+			"id": "xiaohongshu",
+			"type": "xiaohongshu",
+			"value": "https://www.xiaohongshu.com/user/profile/5dd7633a0000000001009b58",
 			"label": "",
 			"order": 4
+		},
+		{
+			"id": "csdn",
+			"type": "csdn",
+			"value": "https://blog.csdn.net/2604_96036106",
+			"label": "",
+			"order": 3
 		}
 	],
 	"clockShowSeconds": false,
