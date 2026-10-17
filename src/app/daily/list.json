@@ -1,0 +1,76 @@
+[
+	{
+		"id": "sample-tea",
+		"date": "2026-10-12",
+		"type": "video",
+		"src": "/daily/sample-tea.mp4",
+		"poster": "/daily/sample-tea.webp",
+		"width": 720,
+		"height": 960,
+		"caption": "示例视频：傍晚的茶园，风是绿色的。",
+		"location": "茶山",
+		"mood": "🍃"
+	},
+	{
+		"id": "sample-persimmon",
+		"date": "2026-10-08",
+		"type": "image",
+		"src": "/images/pictures/d868a9d12c640607.webp",
+		"width": 1280,
+		"height": 1707,
+		"caption": "示例：挂在窗边的柿子，等它慢慢变甜。",
+		"mood": "🧡"
+	},
+	{
+		"id": "sample-lake",
+		"date": "2026-10-03",
+		"type": "video",
+		"src": "/daily/sample-lake.mp4",
+		"poster": "/daily/sample-lake.webp",
+		"width": 1280,
+		"height": 960,
+		"caption": "示例视频：湖面安静得像一张纸。",
+		"location": "湖边",
+		"mood": "🌊"
+	},
+	{
+		"id": "sample-potato",
+		"date": "2026-09-27",
+		"type": "image",
+		"src": "/images/pictures/294e9fe7cb4f263d.webp",
+		"width": 1280,
+		"height": 1707,
+		"caption": "示例：周末的菜市场收获。",
+		"mood": "🍠"
+	},
+	{
+		"id": "sample-gardenia",
+		"date": "2026-09-15",
+		"type": "image",
+		"src": "/images/pictures/500a879c4bb952bc.webp",
+		"width": 1080,
+		"height": 1920,
+		"caption": "示例：阳台的栀子花开了。",
+		"location": "阳台",
+		"mood": "🌼"
+	},
+	{
+		"id": "sample-blossom",
+		"date": "2026-09-09",
+		"type": "image",
+		"src": "/images/pictures/25e9f3a783d6002d.webp",
+		"width": 600,
+		"height": 1031,
+		"caption": "示例：雨后的花，挂着很多小水珠。"
+	},
+	{
+		"id": "sample-tower",
+		"date": "2026-09-02",
+		"type": "image",
+		"src": "/images/pictures/00331496b31159e4.webp",
+		"width": 1279,
+		"height": 1706,
+		"caption": "示例：午后散步，抬头看见塔。",
+		"location": "古塔"
+	}
+]

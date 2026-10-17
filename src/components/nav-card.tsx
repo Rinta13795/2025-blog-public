@@ -17,6 +17,8 @@ import ShareFilledSVG from '@/svgs/share-filled.svg'
 import ShareOutlineSVG from '@/svgs/share-outline.svg'
 import WebsiteFilledSVG from '@/svgs/website-filled.svg'
 import WebsiteOutlineSVG from '@/svgs/website-outline.svg'
+import DailyFilledSVG from '@/svgs/daily-filled.svg'
+import DailyOutlineSVG from '@/svgs/daily-outline.svg'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 import { cn } from '@/lib/utils'
@@ -30,6 +32,12 @@ const list = [
 		iconActive: ScrollFilledSVG,
 		label: '近期文章',
 		href: '/blog'
+	},
+	{
+		icon: DailyOutlineSVG,
+		iconActive: DailyFilledSVG,
+		label: '生活日常',
+		href: '/daily'
 	},
 	{
 		icon: ProjectsOutlineSVG,
@@ -86,6 +94,7 @@ export default function NavCard() {
 	if (maxSM) form = 'icons'
 
 	const itemHeight = form === 'full' ? 52 : 28
+	const iconGap = maxSM ? 16 : 24
 
 	let position = useMemo(() => {
 		if (form === 'full') {
@@ -102,9 +111,9 @@ export default function NavCard() {
 
 	const size = useMemo(() => {
 		if (form === 'mini') return { width: 64, height: 64 }
-		else if (form === 'icons') return { width: 340, height: 64 }
+		else if (form === 'icons') return { width: maxSM ? 340 : 388, height: 64 }
 		else return { width: styles.width, height: styles.height }
-	}, [form, styles])
+	}, [form, styles, maxSM])
 
 	useEffect(() => {
 		if (form === 'icons' && activeIndex !== undefined && hoveredIndex !== activeIndex) {
@@ -126,7 +135,7 @@ export default function NavCard() {
 					height={size.height}
 					x={position.x}
 					y={position.y}
-					className={clsx(form != 'full' && 'overflow-hidden', form === 'mini' && 'p-3', form === 'icons' && 'flex items-center gap-6 p-3')}>
+					className={clsx(form != 'full' && 'overflow-hidden', form === 'mini' && 'p-3', form === 'icons' && cn('flex items-center p-3', maxSM ? 'gap-4' : 'gap-6'))}>
 					{form === 'full' && siteContent.enableChristmas && (
 						<>
 							<img
@@ -148,7 +157,7 @@ export default function NavCard() {
 						<>
 							{form !== 'icons' && <div className='text-secondary mt-6 text-sm uppercase'>General</div>}
 
-							<div className={cn('relative mt-2 space-y-2', form === 'icons' && 'mt-0 flex items-center gap-6 space-y-0')}>
+							<div className={cn('relative mt-2 space-y-2', form === 'icons' && cn('mt-0 flex items-center space-y-0', maxSM ? 'gap-4' : 'gap-6'))}>
 								<motion.div
 									className='absolute max-w-[230px] rounded-full border'
 									layoutId='nav-hover'
@@ -156,7 +165,7 @@ export default function NavCard() {
 									animate={
 										form === 'icons'
 											? {
-													left: hoveredIndex * (itemHeight + 24) - extraSize,
+													left: hoveredIndex * (itemHeight + iconGap) - extraSize,
 													top: -extraSize,
 													width: itemHeight + extraSize * 2,
 													height: itemHeight + extraSize * 2
