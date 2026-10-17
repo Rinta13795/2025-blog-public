@@ -73,7 +73,16 @@ export function Lightbox({ moments, index, onChange }: Props) {
 							}}
 							onClick={e => e.stopPropagation()}
 							className='flex max-w-full flex-col items-center'>
-							{moment.type === 'video' ? (
+							{moment.type === 'note' ? (
+								<article className='max-h-[78vh] w-[min(92vw,620px)] overflow-y-auto rounded-[28px] bg-white/90 p-10 shadow-2xl max-sm:p-6'>
+									<div className='text-brand/70 font-averia flex items-center gap-2 text-xs tracking-[0.2em] uppercase'>
+										<span>Diary</span>
+										{moment.mood && <span className='text-base tracking-normal'>{moment.mood}</span>}
+									</div>
+									{moment.title && <h3 className='text-primary mt-4 text-2xl leading-snug font-medium'>{moment.title}</h3>}
+									<p className='text-primary/85 mt-4 text-[15px] leading-8 whitespace-pre-line'>{moment.caption}</p>
+								</article>
+							) : moment.type === 'video' ? (
 								<video
 									src={moment.src}
 									poster={moment.poster}
@@ -92,7 +101,7 @@ export function Lightbox({ moments, index, onChange }: Props) {
 							)}
 
 							<div className='mt-5 max-w-xl text-center'>
-								{moment.caption && (
+								{moment.caption && moment.type !== 'note' && (
 									<p className='text-[15px] leading-relaxed text-white/90'>
 										{moment.mood && <span className='mr-1.5'>{moment.mood}</span>}
 										{moment.caption}
