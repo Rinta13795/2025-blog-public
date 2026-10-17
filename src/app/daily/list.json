@@ -1,5 +1,16 @@
 [
 	{
+		"id": "promo",
+		"date": "2026-10-17",
+		"type": "video",
+		"src": "/daily/promo.mp4",
+		"poster": "/daily/promo.webp",
+		"width": 720,
+		"height": 1280,
+		"caption": "Rinta · 小事，是我的锚点（宣传片）",
+		"mood": "🎬"
+	},
+	{
 		"id": "sample-dusk",
 		"date": "2026-10-12",
 		"type": "video",
