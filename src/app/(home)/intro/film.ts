@@ -20,7 +20,12 @@ export const COLORS = {
 }
 const C = COLORS
 
-export const END = 11
+// 开场序章：比正片早 4 秒（两小节）。第一小节是歌的 riser，第二小节是第一次落点后的律动。
+// render(t) 里 t < 0 的部分就是序章，t = 0 起是原来的光圈扇叶。
+export const LEAD = 4
+// 正片三段 = 光圈 / 胶片 / 文字，各一小节；之后是揭幕。轨道和隧道两段已删掉，内部仍沿用原来的时间轴，用 warp 跳过。
+export const END = 7
+const warp = (t: number) => (t < 4 ? t : t + 4)
 export const REVEAL = [10, 10.9] as const
 
 type Attrs = Record<string, string | number>
@@ -86,6 +91,74 @@ export function createFilm(svg: SVGSVGElement, { photos, tagline, name, subline 
 	const defs = h('defs', {}, svg)
 
 	const bg = h('rect', { x: -5000, y: -5000, width: 10000, height: 10000, fill: C.paper }, svg)
+
+	// ================= 序章：点 → 涟漪 → RINTA =================
+	const g0 = h('g', {}, svg)
+	const riserRipples = [-3.4, -3.05, -2.75, -2.55, -2.42].map(start => ({
+		start,
+		el: h('circle', { r: 0, fill: 'none', stroke: C.cobalt, 'stroke-width': 3 }, g0)
+	}))
+	const preDot = h('circle', { r: 0, fill: C.mint }, g0)
+	const burst = h('circle', { r: 0, fill: 'none', stroke: C.mint, 'stroke-width': 8 }, g0)
+	const burst2 = h('circle', { r: 0, fill: 'none', stroke: C.yellow, 'stroke-width': 4 }, g0)
+	const wordmark = h('g', {}, g0)
+	const wordLetters = [...name.toUpperCase()].map((ch, i, all) => {
+		const el = h(
+			'text',
+			{
+				'text-anchor': 'middle',
+				'dominant-baseline': 'central',
+				'font-size': 210,
+				'font-family': "'Averia Gruesa Libre','PingFang SC',sans-serif",
+				fill: C.cobalt
+			},
+			wordmark
+		)
+		el.textContent = ch
+		return { el, x: (i - (all.length - 1) / 2) * 165 }
+	})
+	const wordLine = h('line', { x1: -230, y1: 150, x2: 230, y2: 150, stroke: C.cobalt, 'stroke-width': 4, 'stroke-linecap': 'round' }, wordmark)
+	const wordDot = h('circle', { cy: 150, r: 9, fill: C.mint }, wordmark)
+	const preSparks = Array.from({ length: 10 }, (_, i) => ({
+		el: h('path', { d: sparkle(14 + (i % 3) * 8), fill: [C.yellow, C.mint, C.sky][i % 3], stroke: C.cobalt, 'stroke-width': 2 }, g0),
+		a: i * 36 + 12,
+		dist: 330 + (i % 4) * 90
+	}))
+
+	function renderPrologue(t: number) {
+		// 第一小节：点出现、越来越快的涟漪、最后一口气吸回去
+		const grow = seg(t, -3.3, -2.45, E.in)
+		const inhale = seg(t, -2.4, -2.06, E.inOut)
+		const dotR = (14 * seg(t, -3.75, -3.35, E.outBack) + 26 * grow) * (1 - 0.8 * inhale)
+		preDot.setAttribute('r', String(t < -2.02 ? Math.max(0, dotR) : 0))
+		riserRipples.forEach(({ start, el }) => {
+			const p = seg(t, start, start + 0.75, E.out)
+			el.setAttribute('r', String(p * 300))
+			el.setAttribute('opacity', String(p > 0 && t < -2.05 ? 1 - p : 0))
+		})
+		// 落点：光环炸开，RINTA 一个字一个字弹出来
+		const b = seg(t, -2, -1.25, E.outExpo)
+		burst.setAttribute('r', String(b * 1300))
+		burst.setAttribute('opacity', String(b > 0 ? 1 - seg(t, -1.9, -1.25) : 0))
+		const b2 = seg(t, -1.95, -1.1, E.outExpo)
+		burst2.setAttribute('r', String(b2 * 900))
+		burst2.setAttribute('opacity', String(b2 > 0 ? 1 - seg(t, -1.85, -1.1) : 0))
+		const beat = Math.max(pulse(t, -1.05, 0.3), pulse(t, -0.05, 0.3))
+		const exit = seg(t, -0.4, 0, E.in)
+		set(wordmark, { transform: tf(0, -40, 0, (1 + 0.035 * beat) * (1 + 0.5 * exit)), opacity: 1 - exit })
+		wordLetters.forEach(({ el, x }, i) => {
+			const p = seg(t, -2 + i * 0.07, -2 + i * 0.07 + 0.4, E.outBack)
+			set(el, { transform: `translate(${x} ${(1 - p) * 120}) rotate(${(1 - p) * -14}) scale(${Math.max(0.0001, p)})`, opacity: p > 0 ? 1 : 0 })
+		})
+		const ln = seg(t, -1.6, -1.1, E.out)
+		set(wordLine, { 'stroke-dasharray': 460, 'stroke-dashoffset': 460 * (1 - ln) })
+		set(wordDot, { cx: lerp(-230, 230, ln), opacity: ln > 0 ? 1 : 0 })
+		preSparks.forEach(sp => {
+			const p = seg(t, -2, -1.2, E.outExpo)
+			const [x, y] = polar(sp.dist * p, sp.a)
+			set(sp.el, { transform: tf(x, y, p * 160, Math.max(0.0001, 1 - seg(t, -1.4, -0.9))), opacity: p > 0 ? 1 : 0 })
+		})
+	}
 
 	// ================= 场景 1：光圈扇叶 =================
 	const g1 = h('g', {}, svg)
@@ -269,6 +342,13 @@ export function createFilm(svg: SVGSVGElement, { photos, tagline, name, subline 
 	}
 
 	function render(t: number) {
+		show(g0, t < 0)
+		if (t < 0) {
+			;[g1, g2, g3, g4, g5].forEach(g => show(g, false))
+			renderPrologue(t)
+			return
+		}
+		t = warp(t)
 		bg.setAttribute('fill', t < 4 ? C.paper : t < 6 ? C.yellow : t < 8 ? C.cobalt : C.paper)
 
 		// ---------- 场景 1 ----------
@@ -395,7 +475,7 @@ export function createFilm(svg: SVGSVGElement, { photos, tagline, name, subline 
 
 	// 揭幕时圆形遮罩的半径（像素），从屏幕中心的那个点长出来
 	function irisRadius(t: number, width: number, height: number) {
-		return seg(t, REVEAL[0], REVEAL[1], E.inOut) * Math.hypot(width, height) * 0.55
+		return seg(warp(t), REVEAL[0], REVEAL[1], E.inOut) * Math.hypot(width, height) * 0.55
 	}
 
 	return {

@@ -5,9 +5,9 @@ import { createPortal } from 'react-dom'
 import { useConfigStore } from '../stores/config-store'
 import dailyList from '@/app/daily/list.json'
 import { useIntroStore } from './intro-store'
-import { createFilm, END, COLORS } from './film'
+import { createFilm, END, LEAD as FILM_LEAD, COLORS } from './film'
 import { playScore, type Score } from './score'
-import { TRACK, loadTrack, playTrack, timeStretch } from './track'
+import { TRACK, LEAD_FILM_SECONDS, loadTrack, playTrack, timeStretch } from './track'
 
 const SEEN_KEY = 'rinta-intro-v1'
 const TAGLINE = 'LITTLE THINGS ANCHOR ME'
@@ -103,7 +103,7 @@ export default function Intro() {
 		}
 		if (!clockRef.current) {
 			const t0 = performance.now()
-			clockRef.current = () => (performance.now() - t0) / 1000 / timeStretch
+			clockRef.current = () => (performance.now() - t0) / 1000 / timeStretch - LEAD_FILM_SECONDS
 		}
 		setStage('play')
 	}
@@ -120,7 +120,7 @@ export default function Intro() {
 		let raf = 0
 		let homeShown = false
 		const frame = () => {
-			const t = Math.max(0, clockRef.current?.() ?? 0)
+			const t = Math.max(-FILM_LEAD, clockRef.current?.() ?? -FILM_LEAD)
 			film.render(t)
 			const r = film.irisRadius(t, innerWidth, innerHeight)
 			const root = rootRef.current
@@ -129,7 +129,7 @@ export default function Intro() {
 				root.style.maskImage = mask
 				root.style.webkitMaskImage = mask
 			}
-			if (!homeShown && t >= 9.6) {
+			if (!homeShown && t >= 5.6) {
 				homeShown = true
 				setHomeVisible(true)
 			}
