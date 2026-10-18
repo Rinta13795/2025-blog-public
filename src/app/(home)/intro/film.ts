@@ -129,7 +129,8 @@ export function createFilm(svg: SVGSVGElement, { photos, tagline, name, subline 
 		// 第一小节：点出现、越来越快的涟漪、最后一口气吸回去
 		const grow = seg(t, -3.3, -2.45, E.in)
 		const inhale = seg(t, -2.4, -2.06, E.inOut)
-		const dotR = (14 * seg(t, -3.75, -3.35, E.outBack) + 26 * grow) * (1 - 0.8 * inhale)
+		// 第一帧就显示点，接住入口页的那个点，点击后画面不会空白
+		const dotR = (10 + 4 * seg(t, -4, -3.7, E.outBack) + 26 * grow) * (1 - 0.8 * inhale)
 		preDot.setAttribute('r', String(t < -2.02 ? Math.max(0, dotR) : 0))
 		riserRipples.forEach(({ start, el }) => {
 			const p = seg(t, start, start + 0.75, E.out)

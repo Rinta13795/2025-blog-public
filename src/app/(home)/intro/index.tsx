@@ -31,6 +31,8 @@ export default function Intro() {
 	const freezeRef = useRef<number | null>(null)
 	const audioRef = useRef<{ ctx: AudioContext; buffer: Promise<AudioBuffer> } | null>(null)
 	const [starting, setStarting] = useState(false)
+	const [pressed, setPressed] = useState(false)
+	const [gateFading, setGateFading] = useState(false)
 
 	useLayoutEffect(() => {
 		const params = new URLSearchParams(location.search)
@@ -83,19 +85,42 @@ export default function Intro() {
 		setTimeout(finish, 500)
 	}, [finish, setHomeVisible])
 
+	// 点击后立刻响一声轻铃：歌的第一秒非常安静，不加这一声会觉得没点上
+	const chime = (ctx: AudioContext) => {
+		const t = ctx.currentTime + 0.01
+		for (const [f, a, d] of [
+			[1318.5, 0.11, 0.7],
+			[2637, 0.04, 0.35]
+		]) {
+			const osc = ctx.createOscillator()
+			const g = ctx.createGain()
+			osc.frequency.value = f
+			g.gain.setValueAtTime(0, t)
+			g.gain.linearRampToValueAtTime(a, t + 0.005)
+			g.gain.exponentialRampToValueAtTime(0.0001, t + d)
+			osc.connect(g).connect(ctx.destination)
+			osc.start(t)
+			osc.stop(t + d + 0.05)
+		}
+	}
+
 	const start = async (withSound: boolean) => {
 		if (starting) return
 		setStarting(true)
+		setGateFading(true)
+		setTimeout(() => setGateFading(false), 450)
 		clockRef.current = null
 		if (withSound) {
 			try {
 				if (TRACK && audioRef.current) {
 					const { ctx, buffer } = audioRef.current
 					await ctx.resume()
+					chime(ctx)
 					scoreRef.current = playTrack(ctx, await buffer, TRACK.stretch)
 				} else {
 					const ctx = new AudioContext()
 					await ctx.resume()
+					chime(ctx)
 					scoreRef.current = playScore(ctx)
 				}
 				clockRef.current = scoreRef.current.now
@@ -174,45 +199,61 @@ export default function Intro() {
 
 	if (stage === 'off') return null
 
+	const gate = (
+		<div
+			className={`absolute inset-0 flex flex-col items-center justify-center select-none ${stage === 'gate' ? 'cursor-pointer' : 'pointer-events-none'}`}
+			style={{
+				background: COLORS.paper,
+				opacity: stage === 'gate' ? 1 : 0,
+				transform: stage === 'gate' ? 'none' : 'scale(1.04)',
+				transition: 'opacity .4s ease, transform .4s ease'
+			}}
+			onPointerDown={() => setPressed(true)}
+			onPointerUp={() => setPressed(false)}
+			onPointerLeave={() => setPressed(false)}
+			onClick={() => start(true)}>
+			<div className='relative mb-10 h-10 w-40'>
+				<span className='absolute top-0 left-1/2 size-4 rounded-full' style={{ background: COLORS.mint, animation: 'intro-bob 1.6s ease-in-out infinite' }} />
+				<span
+					className='absolute bottom-0 left-1/2 h-4 w-28 rounded-[50%] border-2'
+					style={{ borderColor: COLORS.cobalt, animation: 'intro-ripple 1.6s ease-out infinite' }}
+				/>
+			</div>
+			<div className='font-averia text-6xl tracking-[0.25em] max-sm:text-5xl' style={{ color: COLORS.cobalt }}>
+				{name.toUpperCase()}
+			</div>
+			<div className='mt-4 font-mono text-xs tracking-[0.45em]' style={{ color: COLORS.cobalt, opacity: 0.6 }}>
+				{TAGLINE}
+			</div>
+			<button
+				className='mt-12 rounded-full px-8 py-3 text-sm text-white transition-[transform,box-shadow,filter] duration-150 ease-out hover:-translate-y-0.5 hover:shadow-[0_18px_36px_-12px_#2340ff] hover:brightness-110'
+				style={{
+					background: COLORS.cobalt,
+					transform: pressed || starting ? 'scale(0.94)' : undefined,
+					boxShadow: pressed || starting ? '0 0 0 8px #2340ff33, 0 8px 20px -10px #2340ff' : '0 12px 30px -12px #2340ff'
+				}}>
+				{starting ? '♪ 进入中…' : '▶ 点击进入 · 有声音'}
+			</button>
+			<button
+				className='mt-4 rounded-full px-3 py-1 text-xs tracking-wider transition-colors hover:bg-white/70'
+				style={{ color: COLORS.cobalt, opacity: 0.55 }}
+				onPointerDown={e => e.stopPropagation()}
+				onClick={e => {
+					e.stopPropagation()
+					start(false)
+				}}>
+				静音进入
+			</button>
+		</div>
+	)
+
 	return createPortal(
 		<div
 			ref={rootRef}
 			className='fixed inset-0 z-[1000] overflow-hidden transition-opacity duration-500'
 			style={{ background: COLORS.paper, opacity: stage === 'leaving' ? 0 : 1 }}>
-			{stage === 'gate' ? (
-				<div className='absolute inset-0 flex cursor-pointer flex-col items-center justify-center select-none' onClick={() => start(true)}>
-					<div className='relative mb-10 h-10 w-40'>
-						<span
-							className='absolute top-0 left-1/2 size-4 rounded-full'
-							style={{ background: COLORS.mint, animation: 'intro-bob 1.6s ease-in-out infinite' }}
-						/>
-						<span
-							className='absolute bottom-0 left-1/2 h-4 w-28 rounded-[50%] border-2'
-							style={{ borderColor: COLORS.cobalt, animation: 'intro-ripple 1.6s ease-out infinite' }}
-						/>
-					</div>
-					<div className='font-averia text-6xl tracking-[0.25em] max-sm:text-5xl' style={{ color: COLORS.cobalt }}>
-						{name.toUpperCase()}
-					</div>
-					<div className='mt-4 font-mono text-xs tracking-[0.45em]' style={{ color: COLORS.cobalt, opacity: 0.6 }}>
-						{TAGLINE}
-					</div>
-					<button className='mt-12 rounded-full px-8 py-3 text-sm text-white shadow-[0_12px_30px_-12px_#2340ff]' style={{ background: COLORS.cobalt }}>
-						{starting ? '音乐加载中…' : '▶ 点击进入 · 有声音'}
-					</button>
-					<button
-						className='mt-4 text-xs tracking-wider'
-						style={{ color: COLORS.cobalt, opacity: 0.55 }}
-						onClick={e => {
-							e.stopPropagation()
-							start(false)
-						}}>
-						静音进入
-					</button>
-				</div>
-			) : (
-				<svg ref={svgRef} className='absolute inset-0 h-full w-full' preserveAspectRatio='xMidYMid slice' />
-			)}
+			{stage !== 'gate' && <svg ref={svgRef} className='absolute inset-0 h-full w-full' preserveAspectRatio='xMidYMid slice' />}
+			{(stage === 'gate' || gateFading) && gate}
 
 			<button
 				onClick={skip}
