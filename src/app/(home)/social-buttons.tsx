@@ -15,6 +15,7 @@ import XiaohongshuSVG from '@/svgs/小红书.svg'
 import ZhihuSVG from '@/svgs/知乎.svg'
 import BilibiliSVG from '@/svgs/哔哩哔哩.svg'
 import QqSVG from '@/svgs/qq.svg'
+import CsdnSVG from '@/svgs/csdn.svg'
 import { motion, AnimatePresence } from 'motion/react'
 import { useEffect, useState, useMemo, useRef } from 'react'
 import type React from 'react'
@@ -39,6 +40,7 @@ type SocialButtonType =
 	| 'zhihu'
 	| 'bilibili'
 	| 'qq'
+	| 'csdn'
 
 interface SocialButtonConfig {
 	id: string
@@ -124,6 +126,7 @@ export default function SocialButtons() {
 		zhihu: ZhihuSVG,
 		bilibili: BilibiliSVG,
 		qq: QqSVG,
+		csdn: CsdnSVG,
 		link: () => null
 	}
 

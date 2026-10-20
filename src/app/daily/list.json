@@ -1,0 +1,103 @@
+[
+	{
+		"id": "promo",
+		"date": "2026-10-17",
+		"type": "video",
+		"src": "/daily/promo.mp4",
+		"poster": "/daily/promo.webp",
+		"width": 720,
+		"height": 1280,
+		"caption": "Rinta · 小事，是我的锚点（宣传片）",
+		"mood": "🎬"
+	},
+	{
+		"id": "sample-dusk",
+		"date": "2026-10-12",
+		"type": "video",
+		"src": "/daily/soft-dusk.mp4",
+		"poster": "/daily/soft-dusk.webp",
+		"width": 720,
+		"height": 888,
+		"caption": "示例视频：傍晚的云，像有人在天上点了一盏灯。",
+		"location": "海边",
+		"mood": "🌆"
+	},
+	{
+		"id": "sample-note",
+		"date": "2026-10-10",
+		"type": "note",
+		"title": "示例日记：慢一点也没关系",
+		"caption": "今天没做什么大事。\n早上煮了咖啡，下午在窗边看了会儿书，傍晚出门走了一圈，风有点凉。\n\n突然觉得，能好好记住这样普通的一天，本身就是一件很幸福的事。",
+		"mood": "☕"
+	},
+	{
+		"id": "sample-sea",
+		"date": "2026-10-08",
+		"type": "image",
+		"src": "/daily/soft-01.webp",
+		"width": 1096,
+		"height": 1352,
+		"caption": "示例：海边的下午，咖啡还没凉。",
+		"mood": "☕"
+	},
+	{
+		"id": "sample-still",
+		"date": "2026-10-03",
+		"type": "video",
+		"src": "/daily/soft-still.mp4",
+		"poster": "/daily/soft-still.webp",
+		"width": 720,
+		"height": 888,
+		"caption": "示例视频：水面很静，世界像按了暂停。",
+		"mood": "🌊"
+	},
+	{
+		"id": "sample-tower",
+		"date": "2026-09-27",
+		"type": "image",
+		"src": "/daily/soft-02.webp",
+		"width": 1096,
+		"height": 1350,
+		"caption": "示例：一栋站在水上的小楼。"
+	},
+	{
+		"id": "sample-door",
+		"date": "2026-09-15",
+		"type": "image",
+		"src": "/daily/soft-05.webp",
+		"width": 1092,
+		"height": 1344,
+		"caption": "示例：粉色的门，开着一树的花。",
+		"location": "巷子口",
+		"mood": "🌸"
+	},
+	{
+		"id": "sample-wall",
+		"date": "2026-09-09",
+		"type": "image",
+		"src": "/daily/soft-06.webp",
+		"width": 1094,
+		"height": 1348,
+		"caption": "示例：整面墙都在开花。"
+	},
+	{
+		"id": "sample-balcony",
+		"date": "2026-09-05",
+		"type": "image",
+		"src": "/daily/soft-04.webp",
+		"width": 1164,
+		"height": 1436,
+		"caption": "示例：抬头看，楼上也是一座花园。"
+	},
+	{
+		"id": "sample-books",
+		"date": "2026-09-02",
+		"type": "image",
+		"src": "/daily/soft-07.webp",
+		"width": 1098,
+		"height": 1352,
+		"caption": "示例：藏在花里的旧书店。",
+		"location": "旧书店",
+		"mood": "📚"
+	}
+]
