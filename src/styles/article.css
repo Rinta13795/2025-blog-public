@@ -16,11 +16,6 @@
 	line-height: 1.25;
 	margin-top: 2em;
 	margin-bottom: 1.5em;
-
-	&::before {
-		content: '# ';
-		@apply text-brand/60;
-	}
 }
 .prose h1 {
 	font-size: 1.75rem;
@@ -31,27 +26,14 @@
 .prose h3 {
 	font-size: 1rem;
 	font-weight: 600;
-
-	&::before {
-		content: '## ';
-		@apply text-brand/60;
-	}
 }
 .prose h4 {
 	font-size: 0.85rem;
 	font-weight: 500;
-	&::before {
-		content: '### ';
-		@apply text-brand/60;
-	}
 }
 .prose h5 {
 	font-size: 0.75rem;
 	font-weight: 500;
-	&::before {
-		content: '#### ';
-		@apply text-brand/60;
-	}
 }
 
 /* Paragraph */
@@ -158,7 +140,9 @@
 	border-radius: 6px;
 	cursor: pointer;
 	opacity: 0;
-	transition: opacity 0.2s, background 0.2s;
+	transition:
+		opacity 0.2s,
+		background 0.2s;
 	z-index: 10;
 }
 

@@ -39,7 +39,9 @@ export function BlogPreview({ markdown, title, tags, date, summary, cover, slug 
 
 					<div className='text-secondary mt-4 flex flex-wrap items-center justify-center gap-3 px-8 text-center text-sm'>
 						{tags.map(t => (
-							<span key={t}>#{t}</span>
+							<span key={t} className='rounded-full bg-white/60 px-2.5 py-0.5 text-xs'>
+								{t}
+							</span>
 						))}
 					</div>
 

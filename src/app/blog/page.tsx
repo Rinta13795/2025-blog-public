@@ -437,8 +437,8 @@ export default function BlogPage() {
 											</div>
 											<div className='flex flex-wrap items-center gap-2 max-sm:hidden'>
 												{(it.tags || []).map(t => (
-													<span key={t} className='text-secondary text-sm'>
-														#{t}
+													<span key={t} className='text-secondary rounded-full bg-white/60 px-2.5 py-0.5 text-xs'>
+														{t}
 													</span>
 												))}
 											</div>
