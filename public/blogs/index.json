@@ -1,5 +1,20 @@
 [
   {
+    "slug": "remote-two-computers",
+    "title": "工位上\"同时用两台电脑\"：从 SSH 碰壁到 Claude Remote Control",
+    "tags": [
+      "折腾",
+      "网络",
+      "SSH",
+      "Claude Code",
+      "远程"
+    ],
+    "date": "2026-11-15T16:18",
+    "summary": "实习时想在公司 Windows 电脑上操作自己的 Mac：SSH 先被代理 TUN 模式拦下，再发现两台电脑根本不在一个网络；最后换个思路，用 Claude Remote Control 远程继续 Mac 上的会话，顺便聊聊公私分开的边界。",
+    "hidden": false,
+    "category": "总结"
+  },
+  {
     "slug": "asset-system-backend-basics",
     "title": "从外键到悲观锁：一个设备资产系统里的后端八课",
     "tags": [
