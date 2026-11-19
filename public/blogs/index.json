@@ -1,5 +1,20 @@
 [
   {
+    "slug": "video-frame-basics",
+    "title": "抽帧之前：从一段监控录像读懂帧、GOP 和时间戳",
+    "tags": [
+      "视频",
+      "H.264",
+      "PyAV",
+      "抽帧",
+      "学习笔记"
+    ],
+    "date": "2026-11-19T19:20",
+    "summary": "做视频抽帧前的两天基础课：为什么视频要压缩 780 倍、I/P/B 帧的区别、GOP 为什么决定重连要等多久、PTS 和 time_base 怎么换算成秒、为什么不能用帧号除以帧率算时间，最后用 PyAV 把一段 60 秒录像逐帧拆开验证。",
+    "hidden": false,
+    "category": "总结"
+  },
+  {
     "slug": "remote-two-computers",
     "title": "工位上\"同时用两台电脑\"：从 SSH 碰壁到 Claude Remote Control",
     "tags": [
