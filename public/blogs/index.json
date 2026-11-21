@@ -1,5 +1,20 @@
 [
   {
+    "slug": "claude-local-backup",
+    "title": "把 Claude Code 的本地会话每天加密备份到 Google Drive：restic + rclone 实战",
+    "tags": [
+      "折腾",
+      "Claude Code",
+      "备份",
+      "restic",
+      "Windows"
+    ],
+    "date": "2026-11-21T23:40",
+    "summary": "侧边栏里一百多个会话全在本地，丢了就没了。先盘点对话内容、标题、分组分别存在哪，发现会话记录里还混着明文密钥，于是用 restic 整份加密、rclone 传到 Google Drive，每天自动跑并做了恢复验证，顺便记下 OAuth client、PowerShell 5.1 和代理的一串坑。",
+    "hidden": false,
+    "category": "总结"
+  },
+  {
     "slug": "video-frame-basics",
     "title": "抽帧之前：从一段监控录像读懂帧、GOP 和时间戳",
     "tags": [
