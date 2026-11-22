@@ -1,5 +1,20 @@
 [
   {
+    "slug": "rinta-me-domain",
+    "title": "用 GitHub 学生包领 rinta.me，再用 Cloudflare + Vercel 把博客挂上去",
+    "tags": [
+      "折腾",
+      "域名",
+      "DNS",
+      "Cloudflare",
+      "Vercel"
+    ],
+    "date": "2026-11-22T13:00",
+    "summary": "从 GitHub 学生包领免费的 .me 域名，一路踩了风控、429 限流、419 过期、一次性链接等坑；再理清注册商、DNS、托管三个角色，在 Vercel 绑定域名、用 Cloudflare 接管 DNS、改 Nameserver，最后搞明白为什么「配好了手机上还是旧页面」。",
+    "hidden": false,
+    "category": "总结"
+  },
+  {
     "slug": "claude-local-backup",
     "title": "把 Claude Code 的本地会话每天加密备份到 Google Drive：restic + rclone 实战",
     "tags": [
