@@ -1,6 +1,6 @@
 ## 起因
 
-博客一直挂在 Vercel 给的默认地址上，一长串 `xxx-six-plum.vercel.app`，发给别人总觉得不像自己的东西。GitHub 学生包里正好有一项：**Namecheap 送一年免费的 `.me` 域名**。
+博客一直挂在 Vercel 给的默认地址上，一长串 `xxx.vercel.app`，发给别人总觉得不像自己的东西。GitHub 学生包里正好有一项：**Namecheap 送一年免费的 `.me` 域名**。
 
 于是给自己定了个目标：**领到 `rinta.me`，然后让它打开就是我的博客。**
 
@@ -43,6 +43,10 @@
 3. **Complete order** → 填邮箱 → **Finish Up**
 4. 去邮箱点验证链接 → 登录或注册 Namecheap 账号 → 完成
 
+![搜索结果：rinta.me 显示 FREE](/blogs/rinta-me-domain/search-result.webp)
+
+![加入购物车后，小计 $0.00](/blogs/rinta-me-domain/cart-free.webp)
+
 我前后走了好几轮才成功。踩的坑按顺序列在下面，每个报错背后都有具体原因。
 
 ### 坑 1：「We have detected an unusual behavior with your order」
@@ -50,6 +54,8 @@
 第一次是让 Claude 建了个定时任务，用浏览器自动化在晚上 21:30 把购物车填好、停在下单前，等我回来点最后一步。结果我点完就被风控拦了。
 
 原因大概率就是**前面那段是自动化操作**，被识别成了异常订单。之后所有提交都改成我自己手动点。
+
+![被风控拦下：We have detected an unusual behavior with your order](/blogs/rinta-me-domain/unusual-behavior.webp)
 
 ### 坑 2：「gmail.com isn't on our list of eligible universities」
 
@@ -61,17 +67,29 @@
 
 ### 坑 3：「429 Too Many Requests」
 
-反复提交、反复刷新，被 nc.me 限流了。这时候**越刷越久**，正确做法是停手等半小时到一小时，或者直接找客服（Namecheap 主站的 Live Chat，主站不受 nc.me 限流影响）。
+反复提交、反复刷新，被 nc.me 限流了。
+
+![429 Too Many Requests](/blogs/rinta-me-domain/err-429.webp)
+
+这时候**越刷越久**，正确做法是停手等半小时到一小时，或者直接找客服（Namecheap 主站的 Live Chat，主站不受 nc.me 限流影响）。
 
 ### 坑 4：「419 Page Expired」
 
-下单页从晚上开到第二天早上，再点提交就是 419。「419 Page Expired」是 Laravel 框架的典型报错：表单里带着一个 CSRF 令牌，页面放久了令牌过期，提交时就会报这个错。**关掉标签页，从入口重新走一遍**就好，流程要一口气做完。
+下单页从晚上开到第二天早上，再点提交就是 419。
+
+![419 Page Expired](/blogs/rinta-me-domain/err-419.webp)
+
+「419 Page Expired」是 Laravel 框架的典型报错：表单里带着一个 CSRF 令牌，页面放久了令牌过期，提交时就会报这个错。**关掉标签页，从入口重新走一遍**就好，流程要一口气做完。
 
 ### 坑 5：「Your confirmation code is not valid or expired」
 
 验证邮件里的「Continue your order」链接**只能用一次**。点完页面跳转了，再刷新或者再点一下，就会提示失效。
 
+![Your confirmation code is not valid or expired](/blogs/rinta-me-domain/code-expired.webp)
+
 我回到搜索页，确认购物车里的 rinta.me 还在，再按流程走一遍，这次一次就过：页面显示 **YOUR EMAIL HAS BEEN VERIFIED**，接着让我登录或注册 Namecheap 账号。
+
+![邮箱验证通过，接下来登录或注册 Namecheap 账号](/blogs/rinta-me-domain/email-verified.webp)
 
 ### 坑 6：注册账号报「We couldn't create your Namecheap account」
 
@@ -80,6 +98,8 @@ nc.me 上直接注册一直失败，最可能是用户名太短、早被占用�
 最后我换了个办法：**去 namecheap.com 主站注册账号，再回 nc.me 用这个账号登录**。登录后页面直接显示：
 
 > Congratulations! Your GitHub account was successfully setup.
+
+![领取成功](/blogs/rinta-me-domain/congratulations.webp)
 
 ### 注册信息怎么填
 
@@ -110,7 +130,9 @@ curl -s https://rdap.identitydigital.services/rdap/domain/rinta.me
 
 Vercel 默认勾的是「把根域名跳转到 www」，我取消了，因为想让短的 `rinta.me` 当主域名。
 
-加完后 Vercel 会给出需要配置的 DNS 记录：
+加完后 Vercel 会给出需要配置的 DNS 记录（下面这张是全部配好以后的状态）：
+
+![Vercel 域名列表：www 308 跳转到 rinta.me，三个域名都是 Valid Configuration](/blogs/rinta-me-domain/vercel-domains.webp)
 
 | 类型 | 名称 | 值 |
 |---|---|---|
@@ -162,9 +184,11 @@ NEXT_PUBLIC_SITE_URL=https://rinta.me
 | A | `@` | `216.198.79.1` | **DNS only（灰云）** |
 | CNAME | `www` | `<随机字符>.vercel-dns-017.com` | **DNS only（灰云）** |
 
+![Cloudflare 里的两条记录，都是 DNS only](/blogs/rinta-me-domain/cloudflare-dns.webp)
+
 **为什么必须是灰云？** 橙云（Proxied）表示流量先经过 Cloudflare 再转给 Vercel。这样 Vercel 看到的就不是用户直接来访，签发 HTTPS 证书和自身的 CDN 都会受影响，Vercel 官方也建议指向它的记录不要开代理。灰云表示 Cloudflare 只负责 DNS 解析，流量直连 Vercel。
 
-最后，Cloudflare 给这个站点分配了两个 Nameserver：`frank.ns.cloudflare.com` 和 `hazel.ns.cloudflare.com`。
+最后，Cloudflare 给这个站点分配了两个 Nameserver，形如 `xxx.ns.cloudflare.com`（每个账号分到的名字不一样）。
 
 ## 第四步：Namecheap 改 Nameserver
 
@@ -174,13 +198,15 @@ Namecheap → Domain List → rinta.me → **NAMESERVERS**，从「Namecheap Bas
 
 同一个页面顺便确认了 **AUTO-RENEW 是关着的**（域名和隐私保护各有一个开关）。第二年续费大约 20 美元，到时候想续再手动续。
 
-改完回 Cloudflare 点「Check nameservers now」。再用 RDAP 查一次注册局，`nameservers` 已经变成 `frank` 和 `hazel`，说明在注册局层面生效了。
+改完回 Cloudflare 点「Check nameservers now」。再用 RDAP 查一次注册局，`nameservers` 已经变成 Cloudflare 的那两个，说明在注册局层面生效了。
 
 ## 第五步：配好了，但打开还是旧页面
 
 到这一步，Vercel 后台很快变成 **Valid Configuration**。可我用 Chrome 打开 rinta.me，看到的是：
 
 > 您的连接不是私密连接　NET::ERR_CERT_COMMON_NAME_INVALID
+
+![NET::ERR_CERT_COMMON_NAME_INVALID](/blogs/rinta-me-domain/cert-invalid.webp)
 
 手机上打开则是一个只有 README 的 GitHub Pages 页面。
 
@@ -231,7 +257,11 @@ curl -s -o /dev/null -w "%{http_code} -> %{redirect_url}\n" https://www.rinta.me
 - 在我的 GitHub 上**新建了一个 `<用户名>.github.io` 仓库**，里面只有一个 README（标题是 GitHub 资料里的名字），外加一个写着 `rinta.me` 的 CNAME 文件
 - 把 `rinta.me` 的 DNS 指向 GitHub Pages 的四个 IP
 
-这就是为什么第一次打开 rinta.me，看到的是一个只有名字的白页面。如果你本来就打算用 GitHub Pages 建站，这个选项很方便。如果像我一样用 Vercel，**不用勾**，勾了之后还要记得处理那个自动建的仓库。
+这就是为什么第一次打开 rinta.me，看到的是一个只有名字的白页面，而且因为 GitHub 还没签好证书，Chrome 先弹了个「不支持安全连接」。
+
+![GitHub Pages 还没证书时，Chrome 提示此网站不支持安全连接](/blogs/rinta-me-domain/github-pages-insecure.webp)
+
+如果你本来就打算用 GitHub Pages 建站，这个选项很方便。如果像我一样用 Vercel，**不用勾**，勾了之后还要记得处理那个自动建的仓库。
 
 ## 没领到的：Name.com 的免费 .dev
 
@@ -240,6 +270,8 @@ curl -s -o /dev/null -w "%{http_code} -> %{redirect_url}\n" https://www.rinta.me
 - `rinta.dev` 2023 年就被别人注册了，`rinta.app` 也没了。用 RDAP 查 Google 注册局（`pubapi.registry.google/rdap/domain/xxx`），返回 200 表示已注册，404 表示没人注册
 - 换成了 `orinta.dev`，加购物车、选免费的 Domain Safe（默认会勾上 7.99 美元一年的 Pro 版，要手动取消）、填联系信息，总价是 $0.00
 - 最后一步卡住了：**付款页要求必须绑信用卡**，不填卡「Complete Order」按钮是灰的。卡只支持 Visa、Mastercard、JCB、Discover，没有银联，也没有支付宝。绑卡还会默认开启自动续费（第二年 22.99 美元）
+
+![总价 $0.00，但不填卡 Complete Order 按钮是灰的](/blogs/rinta-me-domain/namecom-card.webp)
 
 我暂时没有合适的卡，就先不领了，反正 `rinta.me` 已经够用。
 
